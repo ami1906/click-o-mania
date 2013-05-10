@@ -1,0 +1,210 @@
+<!doctype html>
+ 
+<html lang="en">
+<head>
+<style>
+div {
+  width:40px;
+  height:40px;
+position:relative;
+margin:5px;
+
+}
+td
+{
+ height: 54px;
+ width: 54px;
+}
+.R
+{
+background-color:red;
+}
+.B
+{
+background-color:black;
+}
+.G
+{
+background-color:green;
+}
+</style>
+  <meta charset="utf-8" />
+  <script src="jquery-1.9.1.js"></script>
+  <script type="text/javascript">
+
+</script>
+
+  </head>
+<body>
+<script>
+	var rows=4;
+	var cols=4;
+	var row=new Array(rows);
+	var col=new Array(cols);
+	var stack=[];
+	function initializeMatrix()
+	{
+		var arr=["GRGR","RGGG","RGGG","RGGG"];
+		var $table = $('<table/>');
+		for(var i=0;i<rows;i++)
+		{
+			var $tr=$('<tr/>');
+			for(var j=0;j<cols;j++)
+			{	
+				var $wrap = $('<div/>');
+				$wrap.attr('id',i.toString()+j.toString());
+				$wrap.attr('class',arr[i][j]);
+				var $td=$('<td/>');
+				$td.append($wrap);
+				$tr.append($td);
+			}
+			$table.append($tr);
+		}
+		$('body').append($table);
+	}
+	function initializeRow()
+	{
+		for(var i=0;i<rows;i++)
+		row[i]=0;
+	}
+	function initializeCol()
+	{
+		for(var i=0;i<cols;i++)
+		col[i]=0;
+	}
+	function checkAdjacent(i,j,src)
+	{
+		var ii=parseInt(i)+1;
+		var jj=parseInt(j)+1;
+		if(i-1>=0 && $('#'+(i-1)+j).attr("class")==src) return true;
+		if(ii<rows && $('#'+ii.toString()+j).attr("class")==src) return true;
+		if(j-1>=0 && $('#'+i+(j-1)).attr("class")==src) return true;
+		if(j+1<cols && $('#'+i+jj.toString()).attr("class")==src) return true;
+		return false;
+	}
+	
+	function shade(cur)
+	{
+		$('#'+cur).attr("class","B");
+		$('#'+cur).hide();
+		stack.push(cur);
+		var x=cur[0];
+		var y=cur[1];
+		row[x]=row[x]-1;
+		col[y]=col[y]-1;
+			}
+	function Fill(x,y,src)
+	{
+    	while(stack.length!=0)
+    	{
+			var cur=stack.pop();
+			var i=cur[0];
+			var j=cur[1];
+			var ii=parseInt(i)+1;
+			var jj=parseInt(j)+1;
+			(i-1>=0 && $('#'+(i-1)+j).attr("class")==src)?shade(i-1+j):i;		
+			(jj<y && $('#'+i+jj.toString()).attr("class")==src)?shade(i+jj.toString()):i;
+			(ii<x && $('#'+ii.toString()+j).attr("class")==src)?shade(ii.toString()+j):i;
+			(j-1>=0 && $('#'+i+(j-1)).attr("class")==src)?shade(i+j-1):i;
+					}
+	}
+	function slideDown()
+	{
+		for(var i=0;i<cols;i++)
+		{
+			if(col[i]!=0)
+			{
+				for(var j=rows-1;j>=0;j--)
+				{
+					var cell='#'+j.toString()+i.toString();
+					if($(cell).attr("class")=='B')
+					{				
+						for(var k=j-1;k>=0;k--)
+						{
+							var cell='#'+k.toString()+i.toString();
+							if($(cell).attr("class")!='B')
+							{
+								$('#'+j.toString()+i.toString()).attr("class",$('#'+k.toString()+i.toString()).attr("class"));  
+								$('#'+j.toString()+i.toString()).show();
+								$('#'+k.toString()+i.toString()).attr("class","B"); 
+								$('#'+k.toString()+i.toString()).hide();
+								row[j]+=1;
+								row[k]-=1;
+								k=-1;
+							}
+												
+						}
+					
+					}
+				}
+			}		
+		}
+
+	}
+	function slideLeft()
+	{
+		for(var i=0;i<cols-1;i++)
+		{
+			if(col[i]==0)
+			{
+				for(j=i+1;j<cols;j++)
+				{
+					if(col[j]!=0)
+					{
+						col[i]=col[j];
+						col[j]=0;
+						for(k=0;k<rows;k++)
+						{
+							$('#'+k.toString()+i.toString()).attr("class",$('#'+k.toString()+j.toString()).attr("class"));  
+							$('#'+k.toString()+i.toString()).attr("class")!='B'?$('#'+k.toString()+i.toString()).show():'';
+							$('#'+k.toString()+j.toString()).attr("class","B"); 
+							$('#'+k.toString()+j.toString()).hide();
+										
+						}
+					j=cols;
+					}
+				}
+						
+			}
+		
+		}
+
+	}
+$(function()
+{
+	initializeMatrix();
+	initializeRow(rows);
+	initializeCol(cols);
+    for(i=0;i<rows;i++)
+    {
+       for(j=0;j<cols;j++)
+       {
+	   		var cell='#'+i.toString()+j.toString();
+			if($(cell).attr("class")!='B')
+			{	
+	      		row[i]+=1;
+				col[i]+=1;
+			}
+       }    
+    }
+	$("div").click(function() {
+var cur_id=$(this).attr("id");	
+var  i=cur_id[0];
+var j=cur_id[1];
+var src=$(this).attr("class");	
+$(this).hide();
+if(checkAdjacent(i,j,src))
+{
+shade(i+j);
+Fill(rows,cols,src);
+slideDown();
+slideLeft();
+}
+
+});
+});
+
+  </script>
+</body>
+</html>
+
