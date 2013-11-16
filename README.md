@@ -11,4 +11,4 @@ Constraints:
 
 3.) When the blocks in a column are disappeared, then the adjacent right column blocks should make its way to its left.
 
-Check it here: http://ami1991.github.io/click-o-mania
+Check it here: http://ami1906.github.io/click-o-mania
